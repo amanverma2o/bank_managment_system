@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Banking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Basic Banking System</h2>
+        <div id="output"></div>
+        <div class="form-group">
+            <label for="accountNumber">Account Number:</label>
+            <input type="number" id="accountNumber">
+        </div>
+        <div class="form-group">
+            <label for="pin">PIN (4 digits):</label>
+            <input type="password" id="pin" maxlength="4">
+        </div>
+        <div class="form-group">
+            <button class="btn" onclick="checkBalance()">Check Balance</button>
+            <button class="btn" onclick="deposit()">Deposit</button>
+            <button class="btn" onclick="withdraw()">Withdraw</button>
+        </div>
+    </div>
+
+    <script>
+        // Sample account data (for demonstration purposes)
+        let accounts = [
+            { accountNumber: 123456, username: 'Alice', balance: 1000, pin: 1234 },
+            { accountNumber: 654321, username: 'Bob', balance: 500, pin: 4321 }
+        ];
+
+        function checkBalance() {
+            let accountNumber = parseInt(document.getElementById('accountNumber').value);
+            let pin = parseInt(document.getElementById('pin').value);
+
+            let account = accounts.find(acc => acc.accountNumber === accountNumber && acc.pin === pin);
+            if (account) {
+                document.getElementById('output').innerHTML = `Account balance for ${account.username}: $${account.balance}`;
+            } else {
+                document.getElementById('output').innerHTML = 'Authentication failed. Incorrect account number or PIN.';
+            }
+        }
+
+        function deposit() {
+            let accountNumber = parseInt(document.getElementById('accountNumber').value);
+            let pin = parseInt(document.getElementById('pin').value);
+            let amount = parseFloat(prompt('Enter amount to deposit:'));
+
+            let account = accounts.find(acc => acc.accountNumber === accountNumber && acc.pin === pin);
+            if (account) {
+                account.balance += amount;
+                document.getElementById('output').innerHTML = `Deposit of $${amount} successful. New balance: $${account.balance}`;
+            } else {
+                document.getElementById('output').innerHTML = 'Authentication failed. Incorrect account number or PIN.';
+            }
+        }
+
+        function withdraw() {
+            let accountNumber = parseInt(document.getElementById('accountNumber').value);
+            let pin = parseInt(document.getElementById('pin').value);
+            let amount = parseFloat(prompt('Enter amount to withdraw:'));
+
+            let account = accounts.find(acc => acc.accountNumber === accountNumber && acc.pin === pin);
+            if (account) {
+                if (account.balance >= amount) {
+                    account.balance -= amount;
+                    document.getElementById('output').innerHTML = `Withdrawal of $${amount} successful. New balance: $${account.balance}`;
+                } else {
+                    document.getElementById('output').innerHTML = 'Insufficient balance.';
+                }
+            } else {
+                document.getElementById('output').innerHTML = 'Authentication failed. Incorrect account number or PIN.';
+            }
+        }
+    </script>
+</body>
+</html>
