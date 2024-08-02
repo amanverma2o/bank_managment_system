@@ -23,12 +23,22 @@ FILE *transactionsFile;
 
 int main() {
     int choice;
-    accountsFile = fopen("accounts.txt", "a+"); // Open accounts file (create if not exist)
-    transactionsFile = fopen("transactions.txt", "a+"); // Open transactions file (create if not exist)
-    
-    if (accountsFile == NULL || transactionsFile == NULL) {
-        perror("Error opening file");
-        return -1;
+    accountsFile = fopen("accounts.txt", "r+b"); // Open accounts file (create if not exist)
+    if (accountsFile == NULL) {
+        accountsFile = fopen("accounts.txt", "w+b"); // Create file if not exists
+        if (accountsFile == NULL) {
+            perror("Error opening accounts file");
+            return -1;
+        }
+    }
+    transactionsFile = fopen("transactions.txt", "r+b"); // Open transactions file (create if not exist)
+    if (transactionsFile == NULL) {
+        transactionsFile = fopen("transactions.txt", "w+b"); // Create file if not exists
+        if (transactionsFile == NULL) {
+            perror("Error opening transactions file");
+            fclose(accountsFile);
+            return -1;
+        }
     }
 
     while (1) {
@@ -90,6 +100,7 @@ void createAccount() {
     printf("Enter PIN (4 digits): ");
     scanf("%d", &newAccount.pin);
 
+    fseek(accountsFile, 0, SEEK_END); // Ensure writing to the end
     fwrite(&newAccount, sizeof(struct Account), 1, accountsFile);
     printf("Account created successfully.\n");
 }
@@ -107,6 +118,7 @@ void deposit() {
         scanf("%f", &amount);
 
         struct Account tempAccount;
+        rewind(accountsFile);
         while (fread(&tempAccount, sizeof(struct Account), 1, accountsFile)) {
             if (tempAccount.accountNumber == accountNumber) {
                 tempAccount.balance += amount;
@@ -138,6 +150,7 @@ void withdraw() {
         scanf("%f", &amount);
 
         struct Account tempAccount;
+        rewind(accountsFile);
         while (fread(&tempAccount, sizeof(struct Account), 1, accountsFile)) {
             if (tempAccount.accountNumber == accountNumber) {
                 if (tempAccount.balance >= amount) {
@@ -170,6 +183,7 @@ void checkBalance() {
 
     if (authenticate(accountNumber, pin)) {
         struct Account tempAccount;
+        rewind(accountsFile);
         while (fread(&tempAccount, sizeof(struct Account), 1, accountsFile)) {
             if (tempAccount.accountNumber == accountNumber) {
                 printf("Account balance: %.2f\n", tempAccount.balance);
